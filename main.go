@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent/solutions/dayfour"
 	"advent/solutions/dayone"
 	"advent/solutions/daythree"
 	"advent/solutions/daytwo"
@@ -28,6 +29,9 @@ func main() {
 	case "daythree":
 		A, B := daythree.LoadTrees(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "dayfour":
+		A := dayfour.LoadPassports(input)
+		res = fmt.Sprintf("Day One Results A: %d", A)
 	}
 	fmt.Println(res)
 }
