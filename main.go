@@ -9,8 +9,8 @@ import (
 	"fmt"
 )
 
-// res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
-// res = fmt.Sprintf("Day One Results A: %d", A)
+// res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+// res = fmt.Sprintf("%s Results A: %d", challenge, A)
 
 func main() {
 	var challenge string
@@ -30,8 +30,8 @@ func main() {
 		A, B := daythree.LoadTrees(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayfour":
-		A := dayfour.LoadPassports(input)
-		res = fmt.Sprintf("Day One Results A: %d", A)
+		A, B := dayfour.LoadPassports(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	fmt.Println(res)
 }
