@@ -2,10 +2,13 @@ package main
 
 import (
 	"advent/solutions/dayone"
+	"advent/solutions/daythree"
 	"advent/solutions/daytwo"
 	"flag"
 	"fmt"
 )
+
+// res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
 
 func main() {
 	var challenge string
@@ -21,6 +24,9 @@ func main() {
 	case "daytwo":
 		A, B := daytwo.ValidatePasswords(input)
 		res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
+	case "daythree":
+		A := daythree.LoadTrees(input)
+		res = fmt.Sprintf("Day One Results A: %d", A)
 	}
 	fmt.Println(res)
 }
