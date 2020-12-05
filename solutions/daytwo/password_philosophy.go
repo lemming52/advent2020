@@ -34,12 +34,15 @@ func (p Password) IsValid() bool {
 	return count >= p.min
 }
 
+// IsValidDownTheRoad is an alternative validity check
+func (p Password) IsValidDownTheRoad() bool {
+	first := rune(p.password[p.min-1]) == p.character
+	second := rune(p.password[p.max-1]) == p.character
+	return (first || second) && !(first && second)
+}
+
 // ValidatePasswords loads a file, loads each line into a password object and checks if it is valid
-func ValidatePasswords(path string) int {
-	/*
-		Load each password and ruleset
-		check if each password and ruleset is valid
-	*/
+func ValidatePasswords(path string) (int, int) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +55,8 @@ func ValidatePasswords(path string) int {
 	}
 
 	scanner := bufio.NewScanner(file)
-	valid := 0
+	valid, validDownTheRoad := 0, 0
+
 	for scanner.Scan() {
 		match := pattern.FindStringSubmatch(scanner.Text())
 		if match == nil {
@@ -75,6 +79,9 @@ func ValidatePasswords(path string) int {
 		if password.IsValid() {
 			valid++
 		}
+		if password.IsValidDownTheRoad() {
+			validDownTheRoad++
+		}
 	}
-	return valid
+	return valid, validDownTheRoad
 }

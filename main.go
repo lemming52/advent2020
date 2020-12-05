@@ -19,8 +19,8 @@ func main() {
 		A, B := dayone.LoadReport(input)
 		res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
 	case "daytwo":
-		A := daytwo.ValidatePasswords(input)
-		res = fmt.Sprintf("Day One Results A: %d", A)
+		A, B := daytwo.ValidatePasswords(input)
+		res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
 	}
 	fmt.Println(res)
 }
