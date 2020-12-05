@@ -15,7 +15,6 @@ const SUM = 2020
 // and returns the product of the two numbers
 // So, two sum
 func RepairReport(numbers []int64) int64 {
-
 	complements := map[int64]bool{}
 	for _, n := range numbers {
 		complement := SUM - n
