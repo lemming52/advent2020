@@ -11,8 +11,11 @@ func main() {
 	flag.StringVar(&challenge, "challenge", "dayone", "challenge in <day><number> format, with number as the word")
 	flag.Parse()
 
+	var res string
 	switch challenge {
 	case "dayone":
-		fmt.Println(dayone.LoadReport("inputs/dayone.txt"))
+		A, B := dayone.LoadReport("inputs/dayone.txt")
+		res = fmt.Sprintf("Day One Results A: %d B: %d", A, B)
 	}
+	fmt.Println(res)
 }

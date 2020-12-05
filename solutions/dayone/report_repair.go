@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -12,6 +13,7 @@ const SUM = 2020
 
 // RepairReport Takes a list of numbers, finds the two entries that sum up to 2020
 // and returns the product of the two numbers
+// So, two sum
 func RepairReport(numbers []int64) int64 {
 
 	complements := map[int64]bool{}
@@ -26,8 +28,37 @@ func RepairReport(numbers []int64) int64 {
 	return 0
 }
 
+// RepairReportExtra finds three numbers that add to the sum in the list
+// returning that
+// so, three sum
+func RepairReportExtra(numbers []int64) int64 {
+	sort.Slice(numbers, func(i, j int) bool { return numbers[i] < numbers[j] })
+	length := len(numbers)
+	for i, n := range numbers {
+		if n > SUM {
+			return 0
+		}
+		j := i + 1
+		k := length - 1
+		for j < k {
+			b := numbers[j]
+			c := numbers[k]
+			total := n + b + c
+			if total == SUM {
+				return n * b * c
+			}
+			if total > SUM {
+				k--
+			} else {
+				j++
+			}
+		}
+	}
+	return 0
+}
+
 // LoadReport loads an input text file and executes the repair report function
-func LoadReport(reportPath string) int64 {
+func LoadReport(reportPath string) (int64, int64) {
 	file, err := os.Open(reportPath)
 	if err != nil {
 		log.Fatal(err)
@@ -47,5 +78,5 @@ func LoadReport(reportPath string) int64 {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return RepairReport(reportNumbers)
+	return RepairReport(reportNumbers), RepairReportExtra(reportNumbers)
 }
