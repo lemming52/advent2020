@@ -16,8 +16,27 @@ import (
 func main() {
 	var challenge string
 	flag.StringVar(&challenge, "challenge", "dayone", "challenge in <day><number> format, with number as the word")
+	all := flag.Bool("all", false, "display all results")
 	flag.Parse()
 
+	completed := []string{
+		"dayone",
+		"daytwo",
+		"daythree",
+		"dayfour",
+		"dayfive",
+	}
+	if *all {
+		for _, c := range completed {
+			fmt.Println(RunChallenge(c))
+		}
+	} else {
+		fmt.Println(RunChallenge(challenge))
+	}
+
+}
+
+func RunChallenge(challenge string) string {
 	var res string
 	input := fmt.Sprintf("inputs/%s.txt", challenge)
 	switch challenge {
@@ -37,5 +56,5 @@ func main() {
 		A, B := dayfive.LoadBoardingPasses(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
-	fmt.Println(res)
+	return res
 }
