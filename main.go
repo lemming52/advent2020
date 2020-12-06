@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent/solutions/dayfive"
 	"advent/solutions/dayfour"
 	"advent/solutions/dayone"
 	"advent/solutions/daythree"
@@ -32,6 +33,9 @@ func main() {
 	case "dayfour":
 		A, B := dayfour.LoadPassports(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "dayfive":
+		A := dayfive.LoadBoardingPasses(input)
+		res = fmt.Sprintf("%s Results A: %d", challenge, A)
 	}
 	fmt.Println(res)
 }
