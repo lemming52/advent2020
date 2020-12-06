@@ -6,17 +6,29 @@ import (
 	"os"
 )
 
-func TotalQuestions(group []string) int {
-	questions := map[rune]bool{}
+func TotalQuestions(group []string) (int, int) {
+	questions := map[rune]int{}
 	for _, person := range group {
 		for _, c := range person {
-			questions[c] = true
+			_, ok := questions[c]
+			if !ok {
+				questions[c] = 1
+			} else {
+				questions[c]++
+			}
 		}
 	}
-	return len(questions)
+	counter := 0
+	people := len(group)
+	for _, v := range questions {
+		if v == people {
+			counter++
+		}
+	}
+	return len(questions), counter
 }
 
-func LoadQuestions(path string) int {
+func LoadQuestions(path string) (int, int) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -26,15 +38,20 @@ func LoadQuestions(path string) int {
 	scanner := bufio.NewScanner(file)
 	group := []string{}
 	count := 0
+	agreementCount := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			count = count + TotalQuestions(group)
+			total, agreement := TotalQuestions(group)
+			count = count + total
+			agreementCount = agreementCount + agreement
 			group = []string{}
 		} else {
 			group = append(group, line)
 		}
 	}
-	count = count + TotalQuestions(group)
-	return count
+	total, agreement := TotalQuestions(group)
+	count = count + total
+	agreementCount = agreementCount + agreement
+	return count, agreementCount
 }
