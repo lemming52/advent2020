@@ -120,22 +120,20 @@ func (n *SeatNode) FindMax() int {
 	return n.lowerNode.FindMax()
 }
 
-func (n *SeatNode) FindSpace(midpoint, delta int) int {
+func (n *SeatNode) FindSpace(midpoint, delta, min, max int) int {
 	if n.lowerNode == nil {
 		return n.upperNode.id - 1
 	}
 	if n.upperNode == nil {
 		return n.lowerNode.id + 1
 	}
-	max := n.FindMax()
-	min := n.FindMin()
 	expectedLower := midpoint - min
 	expectedUpper := max - midpoint + 1
 	if n.lowerNode.Children == expectedLower {
-		return n.upperNode.FindSpace(midpoint+delta, delta/2)
+		return n.upperNode.FindSpace(midpoint+delta, delta/2, midpoint, max)
 	}
 	if n.upperNode.Children == expectedUpper {
-		return n.lowerNode.FindSpace(midpoint-delta, delta/2)
+		return n.lowerNode.FindSpace(midpoint-delta, delta/2, min, midpoint-1)
 	}
 	return 0
 }
@@ -166,5 +164,7 @@ func LoadBoardingPasses(path string) (int, int) {
 		seat := scanner.Text()
 		root.AddSeat(seat)
 	}
-	return root.FindMax(), root.FindSpace(512, 256)
+	max := root.FindMax()
+	min := root.FindMin()
+	return max, root.FindSpace(512, 256, min, max)
 }
