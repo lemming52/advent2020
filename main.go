@@ -34,8 +34,8 @@ func main() {
 		A, B := dayfour.LoadPassports(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayfive":
-		A := dayfive.LoadBoardingPasses(input)
-		res = fmt.Sprintf("%s Results A: %d", challenge, A)
+		A, B := dayfive.LoadBoardingPasses(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	fmt.Println(res)
 }

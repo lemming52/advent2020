@@ -18,6 +18,11 @@ func TestParseBoardingPass(t *testing.T) {
 			input:          "FBFBBFFRLR",
 			expectedRow:    44,
 			expectedColumn: 5,
+		}, {
+			name:           "base",
+			input:          "FBBFFBBLLL",
+			expectedRow:    51,
+			expectedColumn: 0,
 		},
 	}
 	for _, test := range tests {
