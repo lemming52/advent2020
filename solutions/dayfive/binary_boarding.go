@@ -26,10 +26,10 @@ type SeatNode struct {
 	upperNode *SeatNode
 }
 
-func (n *SeatNode) AddSeat(s string) {
+func (n *SeatNode) AddSeat(s string) int {
 	if s == "" {
 		n.id = n.rowMin*8 + n.colMin
-		return
+		return n.id
 	}
 	n.Children++
 	if n.nodeDepth < 7 {
@@ -47,7 +47,7 @@ func (n *SeatNode) AddSeat(s string) {
 					id:        -1,
 				}
 			}
-			n.lowerNode.AddSeat(s[1:])
+			return n.lowerNode.AddSeat(s[1:])
 		} else {
 			if n.upperNode == nil {
 				n.upperNode = &SeatNode{
@@ -62,7 +62,7 @@ func (n *SeatNode) AddSeat(s string) {
 					id:        -1,
 				}
 			}
-			n.upperNode.AddSeat(s[1:])
+			return n.upperNode.AddSeat(s[1:])
 		}
 	} else {
 		if s[0] == left {
@@ -79,7 +79,7 @@ func (n *SeatNode) AddSeat(s string) {
 					id:        -1,
 				}
 			}
-			n.lowerNode.AddSeat(s[1:])
+			return n.lowerNode.AddSeat(s[1:])
 		} else {
 			if n.upperNode == nil {
 				n.upperNode = &SeatNode{
@@ -94,10 +94,10 @@ func (n *SeatNode) AddSeat(s string) {
 					id:        -1,
 				}
 			}
-			n.upperNode.AddSeat(s[1:])
+			return n.upperNode.AddSeat(s[1:])
 		}
 	}
-	return
+	return 0
 }
 
 func (n *SeatNode) FindMin() int {
