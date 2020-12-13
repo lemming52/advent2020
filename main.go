@@ -4,6 +4,7 @@ import (
 	"advent/solutions/dayeight"
 	"advent/solutions/dayfive"
 	"advent/solutions/dayfour"
+	"advent/solutions/daynine"
 	"advent/solutions/dayone"
 	"advent/solutions/dayseven"
 	"advent/solutions/daysix"
@@ -67,6 +68,9 @@ func RunChallenge(challenge string) string {
 	case "dayeight":
 		A, B := dayeight.LoadInstructions(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "daynine":
+		A := daynine.LoadNumbers(input)
+		res = fmt.Sprintf("%s Results A: %d", challenge, A)
 	}
 	return res
 }
