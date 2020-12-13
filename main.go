@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent/solutions/dayeight"
 	"advent/solutions/dayfive"
 	"advent/solutions/dayfour"
 	"advent/solutions/dayone"
@@ -62,6 +63,9 @@ func RunChallenge(challenge string) string {
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayseven":
 		A, B := dayseven.LoadBags(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "dayeight":
+		A, B := dayeight.LoadInstructions(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
