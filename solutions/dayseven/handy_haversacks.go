@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 const BagPattern = `([a-z]+ [a-z]+) bag`
@@ -29,18 +30,20 @@ func (n *BagNetwork) GetBag(name string) *Bag {
 		return bag
 	}
 	n.bags[name] = &Bag{
-		name:     name,
-		children: map[string]*Bag{},
-		parents:  map[string]*Bag{},
+		name:        name,
+		children:    map[string]*Bag{},
+		parents:     map[string]*Bag{},
+		childCounts: map[string]int{},
 	}
 	return n.bags[name]
 }
 
 // Bag is a struct that represents any single bag and possible containers or containees
 type Bag struct {
-	name     string
-	parents  map[string]*Bag
-	children map[string]*Bag
+	name        string
+	parents     map[string]*Bag
+	children    map[string]*Bag
+	childCounts map[string]int
 }
 
 // AddParent adds the name of a parent ot a list of possible parents of a bag
@@ -57,33 +60,40 @@ func (b *Bag) AddParent(parent *Bag) {
 
 // AddChild adds a node as a child to the current bag,
 // and propagates the current bag as a parent down the children
-func (b *Bag) AddChild(child *Bag) {
+func (b *Bag) AddChild(child *Bag, number string) {
+	count, err := strconv.Atoi(number)
+	if err != nil {
+		log.Fatal(err)
+	}
 	for _, bag := range b.parents {
 		child.AddParent(bag)
 	}
 	b.children[child.name] = child
+	b.childCounts[child.name] = count
 	child.AddParent(b)
 }
 
+// CountBags recursively counts the bags down.
+func (b *Bag) CountBags() int {
+	count := 0
+	for name, bag := range b.children {
+		count = count + b.childCounts[name]
+		count = count + (b.childCounts[name] * bag.CountBags())
+	}
+	return count
+}
+
 // ParseBag takes a line of the input file and recovers the parent bag and any children
-func ParseBag(s string, parentPattern, childPattern *regexp.Regexp, network *BagNetwork) (*Bag, []*Bag) {
+func ParseBag(s string, parentPattern, childPattern *regexp.Regexp, network *BagNetwork) {
 	parentComponents := parentPattern.FindStringSubmatch(s)
 	parent := network.GetBag(parentComponents[1])
 	children := childPattern.FindAllStringSubmatch(s, -1)
-	childBags := []*Bag{}
 	for _, child := range children {
-		childBags = append(childBags, network.GetBag(child[2]))
+		parent.AddChild(network.GetBag(child[2]), child[1])
 	}
-	return parent, childBags
 }
 
-func LoadBags(path string) int {
-	/*
-		Load all Bags
-		For each bag
-			Construct network of bag dependencies
-		Find number of bags with shiny gold as a child
-	*/
+func LoadBags(path string) (int, int) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -104,10 +114,7 @@ func LoadBags(path string) int {
 	}
 	for scanner.Scan() {
 		line := scanner.Text()
-		parent, children := ParseBag(line, parent, count, &network)
-		for _, child := range children {
-			parent.AddChild(child)
-		}
+		ParseBag(line, parent, count, &network)
 	}
-	return len(network.bags[TargetBag].parents)
+	return len(network.bags[TargetBag].parents), network.bags[TargetBag].CountBags()
 }

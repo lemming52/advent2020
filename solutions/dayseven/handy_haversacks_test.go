@@ -13,20 +13,28 @@ func TestParseBag(t *testing.T) {
 	tests := []struct {
 		name             string
 		input            string
+		parentName       string
+		childName        string
 		expectedParent   *Bag
 		expectedChildren []*Bag
 	}{
 		{
-			name:  "base",
-			input: "light red bags contain 1 bright white bag, 2 muted yellow bags.",
+			name:       "base",
+			input:      "light red bags contain 1 bright white bag, 2 muted yellow bags.",
+			parentName: "light red",
 			expectedParent: &Bag{
 				name: "light red",
-			},
-			expectedChildren: []*Bag{
-				{
-					name: "bright white",
-				}, {
-					name: "muted yellow",
+				children: map[string]*Bag{
+					"bright white": &Bag{
+						name: "bright white",
+					},
+					"muted yellow": &Bag{
+						name: "muted yellow",
+					},
+				},
+				childCounts: map[string]int{
+					"bright white": 1,
+					"muted yellow": 2,
 				},
 			},
 		},
@@ -45,13 +53,11 @@ func TestParseBag(t *testing.T) {
 			network := BagNetwork{
 				bags: map[string]*Bag{},
 			}
-			parent, children := ParseBag(tt.input, parent, count, &network)
-			if !reflect.DeepEqual(parent, tt.expectedParent) {
-				t.Errorf("Parents should match %v %v", parent, tt.expectedParent)
+			ParseBag(tt.input, parent, count, &network)
+			if !reflect.DeepEqual(network.bags[tt.parentName].childCounts, tt.expectedParent.childCounts) {
+				t.Errorf("Parents should match %v %v", network.bags[tt.parentName], tt.expectedParent)
 			}
-			if !reflect.DeepEqual(children, tt.expectedChildren) {
-				t.Errorf("Children should match %v %v", children, tt.expectedChildren)
-			}
+			assert.Equal(t, len(tt.expectedParent.children), len(network.bags[tt.parentName].children))
 		})
 	}
 }
@@ -72,9 +78,10 @@ func TestAddChild(t *testing.T) {
 				parents:  map[string]*Bag{},
 			},
 			parent: &Bag{
-				name:     "light red",
-				children: map[string]*Bag{},
-				parents:  map[string]*Bag{},
+				name:        "light red",
+				children:    map[string]*Bag{},
+				parents:     map[string]*Bag{},
+				childCounts: map[string]int{},
 			},
 			expectedChild: &Bag{
 				name: "bright white",
@@ -91,13 +98,16 @@ func TestAddChild(t *testing.T) {
 						name: "bright white",
 					},
 				},
+				childCounts: map[string]int{
+					"bright white": 1,
+				},
 			},
 		},
 	}
 	for _, test := range tests {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
-			tt.parent.AddChild(tt.child)
+			tt.parent.AddChild(tt.child, "1")
 			assert.Equal(t, len(tt.parent.children), len(tt.expectedParent.children))
 			assert.Equal(t, len(tt.child.parents), len(tt.child.parents))
 		})
@@ -110,6 +120,7 @@ func TestSeveralBags(t *testing.T) {
 		input         []string
 		targetBag     string
 		expectedCount int
+		expectedBags  int
 	}{
 		{
 			name: "base",
@@ -126,6 +137,21 @@ func TestSeveralBags(t *testing.T) {
 			},
 			targetBag:     "shiny gold",
 			expectedCount: 4,
+			expectedBags:  32,
+		}, {
+			name: "alt",
+			input: []string{
+				"shiny gold bags contain 2 dark red bags.",
+				"dark red bags contain 2 dark orange bags.",
+				"dark orange bags contain 2 dark yellow bags.",
+				"dark yellow bags contain 2 dark green bags.",
+				"dark green bags contain 2 dark blue bags.",
+				"dark blue bags contain 2 dark violet bags.",
+				"dark violet bags contain no other bags.",
+			},
+			targetBag:     "shiny gold",
+			expectedCount: 0,
+			expectedBags:  126,
 		},
 	}
 	for _, test := range tests {
@@ -143,13 +169,10 @@ func TestSeveralBags(t *testing.T) {
 				bags: map[string]*Bag{},
 			}
 			for _, input := range tt.input {
-				parent, children := ParseBag(input, parent, count, &network)
-				for _, child := range children {
-					network.AddBag(child)
-					parent.AddChild(child)
-				}
+				ParseBag(input, parent, count, &network)
 			}
 			assert.Equal(t, tt.expectedCount, len(network.bags[tt.targetBag].parents))
+			assert.Equal(t, tt.expectedBags, network.bags[tt.targetBag].CountBags())
 		})
 	}
 }
