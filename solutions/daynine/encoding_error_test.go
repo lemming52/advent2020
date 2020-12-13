@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseNumbers(t *testing.T) {
+func TestFindOutlier(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []int
@@ -51,7 +51,51 @@ func TestParseNumbers(t *testing.T) {
 	for _, test := range tests {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
-			res := ParseNumbers(tt.input, tt.window)
+			res := FindOutlier(tt.input, tt.window)
+			assert.Equal(t, tt.expected, res)
+		})
+	}
+}
+
+func TestFindOutlierSum(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []int
+		expected int
+		outlier  int
+	}{
+		{
+			name: "base",
+			input: []int{
+				35,
+				20,
+				15,
+				25,
+				47,
+				40,
+				62,
+				55,
+				65,
+				95,
+				102,
+				117,
+				150,
+				182,
+				127,
+				219,
+				299,
+				277,
+				309,
+				576,
+			},
+			expected: 62,
+			outlier:  127,
+		},
+	}
+	for _, test := range tests {
+		tt := test
+		t.Run(tt.name, func(t *testing.T) {
+			res := FindOutlierSum(tt.input, tt.outlier)
 			assert.Equal(t, tt.expected, res)
 		})
 	}
