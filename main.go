@@ -8,6 +8,7 @@ import (
 	"advent/solutions/dayone"
 	"advent/solutions/dayseven"
 	"advent/solutions/daysix"
+	"advent/solutions/dayten"
 	"advent/solutions/daythree"
 	"advent/solutions/daytwo"
 	"flag"
@@ -29,6 +30,11 @@ func main() {
 		"daythree",
 		"dayfour",
 		"dayfive",
+		"daysix",
+		"dayseven",
+		"dayeight",
+		"daynine",
+		"dayten",
 	}
 	if *all {
 		for _, c := range completed {
@@ -70,6 +76,9 @@ func RunChallenge(challenge string) string {
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "daynine":
 		A, B := daynine.LoadNumbers(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "dayten":
+		A, B := dayten.LoadAdapters(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
