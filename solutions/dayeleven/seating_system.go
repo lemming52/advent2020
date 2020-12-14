@@ -1,11 +1,19 @@
 package dayeleven
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+)
 
 const (
-	VACANT   = 'L'
+	// VACANT id of seat
+	VACANT = 'L'
+	// OCCUPIED id of occupied seat
 	OCCUPIED = '#'
-	FLOOR    = '.'
+	// FLOOR id of floor
+	FLOOR = '.'
 )
 
 // Seating represents the grid of all seats
@@ -19,9 +27,8 @@ type Seating struct {
 // NewSeating instantiates a new seating grid
 func NewSeating() *Seating {
 	return &Seating{
-		seats:    [][]rune{},
-		height:   0,
-		adjacent: [][]int{},
+		seats:  [][]rune{},
+		height: 0,
 	}
 }
 
@@ -47,42 +54,28 @@ func (s *Seating) CountOccupied() int {
 	return count
 }
 
-// CalculateAdjacencies is a convencience function that instantiates a
-// number of adjacent seats for all locations
-func (s *Seating) CalculateAdjacencies() {
-	for i, row := range s.seats {
-		vals := []int{}
-		for j := range row {
-			if s.seats[i][j] != FLOOR {
-				vals = append(vals, s.checkAdjacent(i, j, VACANT))
-			} else {
-				vals = append(vals, 0)
-			}
-		}
-		s.adjacent = append(s.adjacent, vals)
-	}
-
-}
-
 // checkAdjacent takes a grid reference and returns the number of adjacent
 // seats that match the target rune
 func (s *Seating) checkAdjacent(i, j int, target rune) int {
-	adjacent := []rune{}
-	if i > 0 {
-		adjacent = append(adjacent, s.seats[i-1][j])
-	}
-	if i < s.height-1 {
-		adjacent = append(adjacent, s.seats[i+1][j])
-	}
-	if j > 0 {
-		adjacent = append(adjacent, s.seats[i][j-1])
-	}
-	if j < s.width-1 {
-		adjacent = append(adjacent, s.seats[i][j+1])
+	cells := [][]int{
+		{i - 1, j - 1},
+		{i - 1, j},
+		{i - 1, j + 1},
+		{i, j - 1},
+		{i, j + 1},
+		{i + 1, j - 1},
+		{i + 1, j},
+		{i + 1, j + 1},
 	}
 	count := 0
-	for _, r := range adjacent {
-		if r == target {
+	for _, cell := range cells {
+		if cell[0] == -1 || cell[0] == s.height {
+			continue
+		}
+		if cell[1] == -1 || cell[1] == s.width {
+			continue
+		}
+		if s.seats[cell[0]][cell[1]] == target {
 			count++
 		}
 	}
@@ -98,14 +91,14 @@ func (s *Seating) Iterate() bool {
 		for j, seat := range row {
 			switch seat {
 			case VACANT:
-				if s.adjacent[i][j] == 0 || s.checkAdjacent(i, j, OCCUPIED) == 0 {
+				if s.checkAdjacent(i, j, OCCUPIED) == 0 {
 					newRow = append(newRow, OCCUPIED)
 					changed = true
 				} else {
 					newRow = append(newRow, seat)
 				}
 			case OCCUPIED:
-				if s.adjacent[i][j] > 3 && s.checkAdjacent(i, j, OCCUPIED) > 3 {
+				if s.checkAdjacent(i, j, OCCUPIED) > 3 {
 					newRow = append(newRow, VACANT)
 					changed = true
 				} else {
@@ -129,5 +122,20 @@ func (s *Seating) print() {
 }
 
 func LoadSeats(path string) int {
-	return 0
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	seating := NewSeating()
+	for scanner.Scan() {
+		seating.AddRow(scanner.Text())
+	}
+	unstable := true
+	for unstable {
+		unstable = seating.Iterate()
+	}
+	return seating.CountOccupied()
 }

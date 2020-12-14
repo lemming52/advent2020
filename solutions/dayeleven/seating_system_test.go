@@ -114,7 +114,7 @@ func TestCheckAdjacent(t *testing.T) {
 				"#.#",
 			},
 			target:   '#',
-			expected: 2,
+			expected: 6,
 			i:        1,
 			j:        1,
 		}, {
@@ -125,7 +125,7 @@ func TestCheckAdjacent(t *testing.T) {
 				"#.#",
 			},
 			target:   '#',
-			expected: 1,
+			expected: 2,
 			i:        0,
 			j:        0,
 		}, {
@@ -150,27 +150,6 @@ func TestCheckAdjacent(t *testing.T) {
 			}
 			assert.Equal(t, tt.expected, seating.checkAdjacent(tt.i, tt.j, tt.target))
 		})
-	}
-}
-
-func TestCalculateAdjacencies(t *testing.T) {
-	input := []string{
-		"L.L",
-		"LLL",
-		"L.L",
-	}
-	expected := [][]int{
-		{1, 0, 1},
-		{3, 2, 3},
-		{1, 0, 1},
-	}
-	seating := NewSeating()
-	for _, i := range input {
-		seating.AddRow(i)
-	}
-	seating.CalculateAdjacencies()
-	if !reflect.DeepEqual(expected, seating.adjacent) {
-		t.Errorf("parsed adjacencies should match")
 	}
 }
 
@@ -209,21 +188,87 @@ func TestIterate(t *testing.T) {
 			[]rune("#LLLLLLLL#"),
 			[]rune("#.LLLLLL.L"),
 			[]rune("#.#LLLL.##"),
+		}, {
+			[]rune("#.##.L#.##"),
+			[]rune("#L###LL.L#"),
+			[]rune("L.#.#..#.."),
+			[]rune("#L##.##.L#"),
+			[]rune("#.##.LL.LL"),
+			[]rune("#.###L#.##"),
+			[]rune("..#.#....."),
+			[]rune("#L######L#"),
+			[]rune("#.LL###L.L"),
+			[]rune("#.#L###.##"),
+		}, {
+			[]rune("#.#L.L#.##"),
+			[]rune("#LLL#LL.L#"),
+			[]rune("L.L.L..#.."),
+			[]rune("#LLL.##.L#"),
+			[]rune("#.LL.LL.LL"),
+			[]rune("#.LL#L#.##"),
+			[]rune("..L.L....."),
+			[]rune("#L#LLLL#L#"),
+			[]rune("#.LLLLLL.L"),
+			[]rune("#.#L#L#.##"),
+		}, {
+			[]rune("#.#L.L#.##"),
+			[]rune("#LLL#LL.L#"),
+			[]rune("L.#.L..#.."),
+			[]rune("#L##.##.L#"),
+			[]rune("#.#L.LL.LL"),
+			[]rune("#.#L#L#.##"),
+			[]rune("..L.L....."),
+			[]rune("#L#L##L#L#"),
+			[]rune("#.LLLLLL.L"),
+			[]rune("#.#L#L#.##"),
 		},
 	}
 	seating := NewSeating()
 	seating.seats = input[0]
-	seating.CalculateAdjacencies()
 	seating.height = len(input[0])
 	seating.width = len(input[0][0])
 	i := 1
-	seating.print()
 	for i < len(input) {
 		seating.Iterate()
-		seating.print()
 		if !reflect.DeepEqual(seating.seats, input[i]) {
 			t.Errorf("Seating grids should match %v %v", seating.seats, input[i])
 		}
 		i++
 	}
+}
+
+func TestStable(t *testing.T) {
+	input := [][]rune{
+		[]rune("#.#L.L#.##"),
+		[]rune("#LLL#LL.L#"),
+		[]rune("L.#.L..#.."),
+		[]rune("#L##.##.L#"),
+		[]rune("#.#L.LL.LL"),
+		[]rune("#.#L#L#.##"),
+		[]rune("..L.L....."),
+		[]rune("#L#L##L#L#"),
+		[]rune("#.LLLLLL.L"),
+		[]rune("#.#L#L#.##"),
+	}
+	copy := [][]rune{
+		[]rune("#.#L.L#.##"),
+		[]rune("#LLL#LL.L#"),
+		[]rune("L.#.L..#.."),
+		[]rune("#L##.##.L#"),
+		[]rune("#.#L.LL.LL"),
+		[]rune("#.#L#L#.##"),
+		[]rune("..L.L....."),
+		[]rune("#L#L##L#L#"),
+		[]rune("#.LLLLLL.L"),
+		[]rune("#.#L#L#.##"),
+	}
+	seating := NewSeating()
+	seating.seats = input
+	seating.height = len(input)
+	seating.width = len(input[0])
+	res := seating.Iterate()
+	if !reflect.DeepEqual(seating.seats, copy) {
+		t.Errorf("Seating grids should match %v %v", seating.seats, copy)
+	}
+	assert.Equal(t, false, res)
 }
