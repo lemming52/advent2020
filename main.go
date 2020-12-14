@@ -82,8 +82,8 @@ func RunChallenge(challenge string) string {
 		A, B := dayten.LoadAdapters(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayeleven":
-		A := dayeleven.LoadSeats(input)
-		res = fmt.Sprintf("%s Results A: %d", challenge, A)
+		A, B := dayeleven.LoadSeats(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
 }

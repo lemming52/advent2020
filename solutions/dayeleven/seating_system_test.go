@@ -153,6 +153,106 @@ func TestCheckAdjacent(t *testing.T) {
 	}
 }
 
+func TestCheckVisibleAdjacent(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		target   rune
+		expected int
+		i        int
+		j        int
+	}{
+		{
+			name: "base",
+			input: []string{
+				"#.#",
+				"###",
+				"#.#",
+			},
+			target:   '#',
+			expected: 6,
+			i:        1,
+			j:        1,
+		}, {
+			name: "root",
+			input: []string{
+				"#.#",
+				"###",
+				"#.#",
+			},
+			target:   '#',
+			expected: 3,
+			i:        0,
+			j:        0,
+		}, {
+			name: "corner",
+			input: []string{
+				"#.#",
+				"##L",
+				"#L#",
+			},
+			target:   'L',
+			expected: 2,
+			i:        2,
+			j:        2,
+		}, {
+			name: "sample",
+			input: []string{
+				".......#.",
+				"...#.....",
+				".#.......",
+				".........",
+				"..#L....#",
+				"....#....",
+				".........",
+				"#........",
+				"...#.....",
+			},
+			target:   '#',
+			expected: 8,
+			i:        4,
+			j:        3,
+		}, {
+			name: "hidden",
+			input: []string{
+				".............",
+				".L.L.#.#.#.#.",
+				".............",
+			},
+			target:   '#',
+			expected: 0,
+			i:        1,
+			j:        1,
+		}, {
+			name: "empty",
+			input: []string{
+				".##.##.",
+				"#.#.#.#",
+				"##...##",
+				"...L...",
+				"##...##",
+				"#.#.#.#",
+				".##.##.",
+			},
+			target:   '#',
+			expected: 0,
+			i:        3,
+			j:        3,
+		},
+	}
+	for _, test := range tests {
+		tt := test
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			seating := NewSeating()
+			for _, i := range tt.input {
+				seating.AddRow(i)
+			}
+			assert.Equal(t, tt.expected, seating.checkVisibleAdjacent(tt.i, tt.j, tt.target))
+		})
+	}
+}
+
 func TestIterate(t *testing.T) {
 	input := [][][]rune{
 		{
@@ -271,4 +371,110 @@ func TestStable(t *testing.T) {
 		t.Errorf("Seating grids should match %v %v", seating.seats, copy)
 	}
 	assert.Equal(t, false, res)
+}
+
+func TestIterateVisible(t *testing.T) {
+	input := [][][]rune{
+		{
+			[]rune("L.LL.LL.LL"),
+			[]rune("LLLLLLL.LL"),
+			[]rune("L.L.L..L.."),
+			[]rune("LLLL.LL.LL"),
+			[]rune("L.LL.LL.LL"),
+			[]rune("L.LLLLL.LL"),
+			[]rune("..L.L....."),
+			[]rune("LLLLLLLLLL"),
+			[]rune("L.LLLLLL.L"),
+			[]rune("L.LLLLL.LL"),
+		}, {
+			[]rune("#.##.##.##"),
+			[]rune("#######.##"),
+			[]rune("#.#.#..#.."),
+			[]rune("####.##.##"),
+			[]rune("#.##.##.##"),
+			[]rune("#.#####.##"),
+			[]rune("..#.#....."),
+			[]rune("##########"),
+			[]rune("#.######.#"),
+			[]rune("#.#####.##"),
+		}, {
+			[]rune("#.LL.LL.L#"),
+			[]rune("#LLLLLL.LL"),
+			[]rune("L.L.L..L.."),
+			[]rune("LLLL.LL.LL"),
+			[]rune("L.LL.LL.LL"),
+			[]rune("L.LLLLL.LL"),
+			[]rune("..L.L....."),
+			[]rune("LLLLLLLLL#"),
+			[]rune("#.LLLLLL.L"),
+			[]rune("#.LLLLL.L#"),
+		}, {
+			[]rune("#.L#.##.L#"),
+			[]rune("#L#####.LL"),
+			[]rune("L.#.#..#.."),
+			[]rune("##L#.##.##"),
+			[]rune("#.##.#L.##"),
+			[]rune("#.#####.#L"),
+			[]rune("..#.#....."),
+			[]rune("LLL####LL#"),
+			[]rune("#.L#####.L"),
+			[]rune("#.L####.L#"),
+		}, {
+			[]rune("#.L#.L#.L#"),
+			[]rune("#LLLLLL.LL"),
+			[]rune("L.L.L..#.."),
+			[]rune("##LL.LL.L#"),
+			[]rune("L.LL.LL.L#"),
+			[]rune("#.LLLLL.LL"),
+			[]rune("..L.L....."),
+			[]rune("LLLLLLLLL#"),
+			[]rune("#.LLLLL#.L"),
+			[]rune("#.L#LL#.L#"),
+		}, {
+			[]rune("#.L#.L#.L#"),
+			[]rune("#LLLLLL.LL"),
+			[]rune("L.L.L..#.."),
+			[]rune("##L#.#L.L#"),
+			[]rune("L.L#.#L.L#"),
+			[]rune("#.L####.LL"),
+			[]rune("..#.#....."),
+			[]rune("LLL###LLL#"),
+			[]rune("#.LLLLL#.L"),
+			[]rune("#.L#LL#.L#"),
+		}, {
+			[]rune("#.L#.L#.L#"),
+			[]rune("#LLLLLL.LL"),
+			[]rune("L.L.L..#.."),
+			[]rune("##L#.#L.L#"),
+			[]rune("L.L#.LL.L#"),
+			[]rune("#.LLLL#.LL"),
+			[]rune("..#.L....."),
+			[]rune("LLL###LLL#"),
+			[]rune("#.LLLLL#.L"),
+			[]rune("#.L#LL#.L#"),
+		}, {
+			[]rune("#.L#.L#.L#"),
+			[]rune("#LLLLLL.LL"),
+			[]rune("L.L.L..#.."),
+			[]rune("##L#.#L.L#"),
+			[]rune("L.L#.LL.L#"),
+			[]rune("#.LLLL#.LL"),
+			[]rune("..#.L....."),
+			[]rune("LLL###LLL#"),
+			[]rune("#.LLLLL#.L"),
+			[]rune("#.L#LL#.L#"),
+		},
+	}
+	seating := NewSeating()
+	seating.seats = input[0]
+	seating.height = len(input[0])
+	seating.width = len(input[0][0])
+	i := 1
+	for i < len(input) {
+		seating.IterateVisible()
+		if !reflect.DeepEqual(seating.seats, input[i]) {
+			t.Errorf("Seating grids should match %v %v", seating.seats, input[i])
+		}
+		i++
+	}
 }
