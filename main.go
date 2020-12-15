@@ -11,6 +11,7 @@ import (
 	"advent/solutions/daysix"
 	"advent/solutions/dayten"
 	"advent/solutions/daythree"
+	"advent/solutions/daytwelve"
 	"advent/solutions/daytwo"
 	"flag"
 	"fmt"
@@ -83,6 +84,9 @@ func RunChallenge(challenge string) string {
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayeleven":
 		A, B := dayeleven.LoadSeats(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "daytwelve":
+		A, B := daytwelve.Navigate(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
