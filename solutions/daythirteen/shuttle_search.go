@@ -31,37 +31,33 @@ func FindMagicalDepartureTime(shuttles []int) int {
 		ids = append(ids, shuttle)
 	}
 	sort.Sort(sort.Reverse(sort.IntSlice(ids)))
-	coeff := 1
-	value := ids[0]*coeff - positions[ids[0]]
-	valid := TestValidValue(value, &ids, &positions)
-	for !valid {
-		coeff++
-		value = ids[0]*coeff - positions[ids[0]]
-		valid = TestValidValue(value, &ids, &positions)
-	}
-	return value
-}
-
-func TestValidValue(value int, ids *[]int, positions *map[int]int) bool {
-	for _, id := range (*ids)[1:] {
+	N := 1
+	for _, id := range ids {
 		if id == -1 {
-			return true
+			break
 		}
-		if !isValid(value, id, (*positions)[id]) {
-			return false
-		}
+		N *= id
 	}
-	return true
+
+	total := 0
+	for _, id := range ids {
+		if id == -1 {
+			break
+		}
+		total += ChineseRemainderComponent(id, positions[id], N)
+	}
+	return total % N
 }
 
-func isValid(value, id, position int) bool {
-	coeff := float64(value+position) / float64(id)
-	return coeff == float64(int64(coeff))
-}
-
-func coeffCalculation(initialFactor, initialCoeff, initialOffset, nextFactor, nextOffset int) float64 {
-	num := initialFactor*initialCoeff - initialOffset + nextOffset
-	return float64(num) / float64(nextFactor)
+func ChineseRemainderComponent(id, position, N int) int {
+	n := N / id
+	u := 1
+	val := float64(u*n+1) / float64(id)
+	for val != float64(int64(val)) {
+		u++
+		val = float64(u*n+1) / float64(id)
+	}
+	return u * n * position
 }
 
 func LoadShuttles(path string) (int, int) {
