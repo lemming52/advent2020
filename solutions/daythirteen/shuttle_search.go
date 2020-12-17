@@ -2,6 +2,7 @@ package daythirteen
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -22,6 +23,46 @@ func FindEarliest(ids []int, departureTime int) int {
 	return shuttle * waitTime
 }
 
+func FindMagicalDepartureTime(shuttles []int) int {
+	coefficient := int(1)
+	factor := shuttles[0]
+	offset := 0
+	for i, shuttle := range shuttles[1:] {
+		fmt.Println(factor, coefficient, offset, shuttle)
+		if shuttle == -1 {
+			continue
+		}
+		factor, coefficient, offset = FindNextShared(
+			factor,
+			coefficient,
+			offset,
+			shuttle,
+			i+1,
+		)
+	}
+	fmt.Println(factor, coefficient, offset)
+	return coefficient*factor - offset
+
+}
+
+func FindNextShared(initialFactor, initialCoeff, initialOffset, nextFactor, nextOffset int) (int, int, int) {
+	coeff := initialCoeff
+	nextCoefficient := coeffCalculation(initialFactor, coeff, initialOffset, nextFactor, nextOffset)
+	for nextCoefficient != float64(int64(nextCoefficient)) {
+		coeff++
+		nextCoefficient = coeffCalculation(initialFactor, coeff, initialOffset, nextFactor, nextOffset)
+	}
+	if nextFactor > initialFactor {
+		return nextFactor, int(nextCoefficient), nextOffset
+	}
+	return initialFactor, coeff, initialOffset
+}
+
+func coeffCalculation(initialFactor, initialCoeff, initialOffset, nextFactor, nextOffset int) float64 {
+	num := initialFactor*initialCoeff - initialOffset + nextOffset
+	return float64(num) / float64(nextFactor)
+}
+
 func LoadShuttles(path string) int {
 	file, err := os.Open(path)
 	if err != nil {
@@ -37,7 +78,8 @@ func LoadShuttles(path string) int {
 	}
 
 	scanner.Scan()
-	shuttles := parseShuttles(scanner.Text())
+	line := scanner.Text()
+	shuttles := parseShuttles(line)
 	return FindEarliest(shuttles, departureTime)
 }
 
@@ -47,6 +89,22 @@ func parseShuttles(s string) []int {
 	for _, e := range entries {
 		if e == "x" {
 			continue
+		}
+		id, err := strconv.Atoi(e)
+		if err != nil {
+			log.Fatal(err)
+		}
+		shuttles = append(shuttles, id)
+	}
+	return shuttles
+}
+
+func parseShuttlesAndSpaces(s string) []int {
+	entries := strings.Split(s, ",")
+	shuttles := []int{}
+	for _, e := range entries {
+		if e == "x" {
+			shuttles = append(shuttles, -1)
 		}
 		id, err := strconv.Atoi(e)
 		if err != nil {
