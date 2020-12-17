@@ -93,8 +93,8 @@ func RunChallenge(challenge string) string {
 		A, B := daytwelve.Navigate(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "daythirteen":
-		A := daythirteen.LoadShuttles(input)
-		res = fmt.Sprintf("%s Results A: %d", challenge, A)
+		A, B := daythirteen.LoadShuttles(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
 }

@@ -2,9 +2,9 @@ package daythirteen
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -24,38 +24,39 @@ func FindEarliest(ids []int, departureTime int) int {
 }
 
 func FindMagicalDepartureTime(shuttles []int) int {
-	coefficient := int(1)
-	factor := shuttles[0]
-	offset := 0
-	for i, shuttle := range shuttles[1:] {
-		fmt.Println(factor, coefficient, offset, shuttle)
-		if shuttle == -1 {
-			continue
-		}
-		factor, coefficient, offset = FindNextShared(
-			factor,
-			coefficient,
-			offset,
-			shuttle,
-			i+1,
-		)
+	positions := map[int]int{}
+	ids := []int{}
+	for i, shuttle := range shuttles {
+		positions[shuttle] = i
+		ids = append(ids, shuttle)
 	}
-	fmt.Println(factor, coefficient, offset)
-	return coefficient*factor - offset
-
+	sort.Sort(sort.Reverse(sort.IntSlice(ids)))
+	coeff := 1
+	value := ids[0]*coeff - positions[ids[0]]
+	valid := TestValidValue(value, &ids, &positions)
+	for !valid {
+		coeff++
+		value = ids[0]*coeff - positions[ids[0]]
+		valid = TestValidValue(value, &ids, &positions)
+	}
+	return value
 }
 
-func FindNextShared(initialFactor, initialCoeff, initialOffset, nextFactor, nextOffset int) (int, int, int) {
-	coeff := initialCoeff
-	nextCoefficient := coeffCalculation(initialFactor, coeff, initialOffset, nextFactor, nextOffset)
-	for nextCoefficient != float64(int64(nextCoefficient)) {
-		coeff++
-		nextCoefficient = coeffCalculation(initialFactor, coeff, initialOffset, nextFactor, nextOffset)
+func TestValidValue(value int, ids *[]int, positions *map[int]int) bool {
+	for _, id := range (*ids)[1:] {
+		if id == -1 {
+			return true
+		}
+		if !isValid(value, id, (*positions)[id]) {
+			return false
+		}
 	}
-	if nextFactor > initialFactor {
-		return nextFactor, int(nextCoefficient), nextOffset
-	}
-	return initialFactor, coeff, initialOffset
+	return true
+}
+
+func isValid(value, id, position int) bool {
+	coeff := float64(value+position) / float64(id)
+	return coeff == float64(int64(coeff))
 }
 
 func coeffCalculation(initialFactor, initialCoeff, initialOffset, nextFactor, nextOffset int) float64 {
@@ -63,7 +64,7 @@ func coeffCalculation(initialFactor, initialCoeff, initialOffset, nextFactor, ne
 	return float64(num) / float64(nextFactor)
 }
 
-func LoadShuttles(path string) int {
+func LoadShuttles(path string) (int, int) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -80,7 +81,8 @@ func LoadShuttles(path string) int {
 	scanner.Scan()
 	line := scanner.Text()
 	shuttles := parseShuttles(line)
-	return FindEarliest(shuttles, departureTime)
+	shuttlesAndSpaces := parseShuttlesAndSpaces(line)
+	return FindEarliest(shuttles, departureTime), FindMagicalDepartureTime(shuttlesAndSpaces)
 }
 
 func parseShuttles(s string) []int {
@@ -105,6 +107,7 @@ func parseShuttlesAndSpaces(s string) []int {
 	for _, e := range entries {
 		if e == "x" {
 			shuttles = append(shuttles, -1)
+			continue
 		}
 		id, err := strconv.Atoi(e)
 		if err != nil {
