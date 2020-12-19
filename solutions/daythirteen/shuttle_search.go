@@ -23,6 +23,7 @@ func FindEarliest(ids []int, departureTime int) int {
 	return shuttle * waitTime
 }
 
+// FindMagicalDepartureTime is the function for solving the niche case of the part 2
 func FindMagicalDepartureTime(shuttles []int) int {
 	positions := map[int]int{}
 	ids := []int{}
@@ -49,7 +50,11 @@ func FindMagicalDepartureTime(shuttles []int) int {
 	return total % N
 }
 
+// ChineseRemainderComponent computes the term for remained
 func ChineseRemainderComponent(id, position, N int) int {
+	/*
+		derived from https://www.dave4math.com/mathematics/chinese-remainder-theorem/
+	*/
 	n := N / id
 	u := 1
 	val := float64(u*n+1) / float64(id)
