@@ -98,7 +98,7 @@ func RunChallenge(challenge string) string {
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayfourteen":
 		A := dayfourteen.InitialiseDocking(input)
-		res = fmt.Sprintf("%s Results A: %f", challenge, A)
+		res = fmt.Sprintf("%s Results A: %d", challenge, A)
 	}
 	return res
 }

@@ -2,6 +2,7 @@ package dayfourteen
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -11,18 +12,40 @@ import (
 )
 
 type Memory struct {
-	mask   string
-	memory map[int]float64
+	mask    string
+	minMask uint64
+	maxMask uint64
+	memory  map[int]uint64
 }
 
-func NewMemory() Memory {
-	return Memory{
-		memory: map[int]float64{},
+func NewMemory() *Memory {
+	return &Memory{
+		memory:  map[int]uint64{},
+		minMask: 0,
+		maxMask: 0,
 	}
 }
 
 func (m *Memory) UpdateMask(s string) {
+	power := float64(35)
+	for _, c := range s {
+		if c == 'X' {
+			m.maxMask += uint64(math.Pow(2, power))
+		} else {
+			if c == '1' {
+				increment := uint64(math.Pow(2, power))
+				m.maxMask += increment
+				m.minMask += increment
+			}
+		}
+		power--
+	}
 	m.mask = s
+}
+
+func (m *Memory) AddValueAlt(address, value int) {
+	val := uint64(value)
+	m.memory[address] = (val | m.minMask) & m.maxMask
 }
 
 func (m *Memory) AddValue(address, value int) {
@@ -30,6 +53,7 @@ func (m *Memory) AddValue(address, value int) {
 	bits := strconv.FormatUint(uint64(value), 2)
 	start := 36 - len(bits)
 	power := float64(35)
+	fmt.Println(bits, start)
 	for i, c := range m.mask {
 		switch c {
 		case '0':
@@ -39,7 +63,7 @@ func (m *Memory) AddValue(address, value int) {
 		}
 		power--
 	}
-	m.memory[address] = val
+	m.memory[address] = uint64(val)
 }
 
 func (m *Memory) applyMask(sign int, power float64, position, start int, bits string) float64 {
@@ -56,15 +80,15 @@ func (m *Memory) applyMask(sign int, power float64, position, start int, bits st
 	}
 }
 
-func (m *Memory) Total() float64 {
-	total := float64(0)
+func (m *Memory) Total() uint64 {
+	total := uint64(0)
 	for _, val := range m.memory {
 		total += val
 	}
 	return total
 }
 
-func InitialiseDocking(path string) float64 {
+func InitialiseDocking(path string) uint64 {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -72,22 +96,27 @@ func InitialiseDocking(path string) float64 {
 	defer file.Close()
 
 	m := NewMemory()
-	pattern, err := regexp.Compile(`mem\[(\d+)\] = (\d+)`)
+	maskPattern, err := regexp.Compile(`mask = ([0,1,X]{36})`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	valPattern, err := regexp.Compile(`mem\[(\d+)\] = (\d+)`)
 	if err != nil {
 		log.Fatal(err)
 	}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		parseLine(scanner.Text(), pattern, m)
+		parseLine(scanner.Text(), maskPattern, valPattern, m)
 	}
 	return m.Total()
 }
 
-func parseLine(line string, pattern *regexp.Regexp, m Memory) {
+func parseLine(line string, maskPattern, valPattern *regexp.Regexp, m *Memory) {
 	if strings.HasPrefix(line, "mask = ") {
-		m.UpdateMask(line[7:])
+		match := maskPattern.FindStringSubmatch(line)
+		m.UpdateMask(match[1])
 	} else {
-		match := pattern.FindStringSubmatch(line)
+		match := valPattern.FindStringSubmatch(line)
 		address, err := strconv.Atoi(match[1])
 		if err != nil {
 			log.Fatal(err)
@@ -96,6 +125,6 @@ func parseLine(line string, pattern *regexp.Regexp, m Memory) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		m.AddValue(address, value)
+		m.AddValueAlt(address, value)
 	}
 }
