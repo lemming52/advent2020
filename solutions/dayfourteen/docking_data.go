@@ -2,7 +2,6 @@ package dayfourteen
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -27,25 +26,7 @@ func NewMemory() *Memory {
 }
 
 func (m *Memory) UpdateMask(s string) {
-	power := float64(35)
-	for _, c := range s {
-		if c == 'X' {
-			m.maxMask += uint64(math.Pow(2, power))
-		} else {
-			if c == '1' {
-				increment := uint64(math.Pow(2, power))
-				m.maxMask += increment
-				m.minMask += increment
-			}
-		}
-		power--
-	}
 	m.mask = s
-}
-
-func (m *Memory) AddValueAlt(address, value int) {
-	val := uint64(value)
-	m.memory[address] = (val | m.minMask) & m.maxMask
 }
 
 func (m *Memory) AddValue(address, value int) {
@@ -53,7 +34,6 @@ func (m *Memory) AddValue(address, value int) {
 	bits := strconv.FormatUint(uint64(value), 2)
 	start := 36 - len(bits)
 	power := float64(35)
-	fmt.Println(bits, start)
 	for i, c := range m.mask {
 		switch c {
 		case '0':
@@ -125,6 +105,6 @@ func parseLine(line string, maskPattern, valPattern *regexp.Regexp, m *Memory) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		m.AddValueAlt(address, value)
+		m.AddValue(address, value)
 	}
 }
