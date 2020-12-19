@@ -153,6 +153,7 @@ func TestTotal2(t *testing.T) {
 	for _, test := range tests {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
+			m2 := NewMemory()
 			m := NewMemory2()
 			maskPattern, err := regexp.Compile(`mask = ([0,1,X]{36})`)
 			if err != nil {
@@ -163,7 +164,7 @@ func TestTotal2(t *testing.T) {
 				log.Fatal(err)
 			}
 			for _, l := range tt.lines {
-				parseLine(l, maskPattern, valPattern, m)
+				parseLine(l, maskPattern, valPattern, m2, m)
 			}
 			assert.Equal(t, tt.expected, m.Total())
 		})
