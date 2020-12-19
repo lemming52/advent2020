@@ -10,21 +10,25 @@ import (
 	"strings"
 )
 
+// Memory is a struct that represents the post encoded memory state
 type Memory struct {
 	mask   string
 	memory map[int]uint64
 }
 
+// NewMemory instantiates a new type 1 memory
 func NewMemory() *Memory {
 	return &Memory{
 		memory: map[int]uint64{},
 	}
 }
 
+// UpdateMask sets the value of the memory mask
 func (m *Memory) UpdateMask(s string) {
 	m.mask = s
 }
 
+// AddValue applies the mask to the provided value and stores it
 func (m *Memory) AddValue(address, value int) {
 	val := float64(value)
 	bits := strconv.FormatUint(uint64(value), 2)
@@ -33,16 +37,16 @@ func (m *Memory) AddValue(address, value int) {
 	for i, c := range m.mask {
 		switch c {
 		case '0':
-			val += m.applyMask(-1, power, i, start, bits)
+			val += m.applyMaskBit(-1, power, i, start, bits)
 		case '1':
-			val += m.applyMask(1, power, i, start, bits)
+			val += m.applyMaskBit(1, power, i, start, bits)
 		}
 		power--
 	}
 	m.memory[address] = uint64(val)
 }
 
-func (m *Memory) applyMask(sign int, power float64, position, start int, bits string) float64 {
+func (m *Memory) applyMaskBit(sign int, power float64, position, start int, bits string) float64 {
 	if position < start {
 		if sign == 1 {
 			return math.Pow(2, power)
@@ -56,6 +60,7 @@ func (m *Memory) applyMask(sign int, power float64, position, start int, bits st
 	}
 }
 
+// Total returns the total value of all set memory addresses
 func (m *Memory) Total() uint64 {
 	total := uint64(0)
 	for _, val := range m.memory {
@@ -64,6 +69,7 @@ func (m *Memory) Total() uint64 {
 	return total
 }
 
+// Memory2 is a memory struct that supports multiple address encodings
 type Memory2 struct {
 	masks           []uint64
 	mask            uint64
@@ -71,6 +77,7 @@ type Memory2 struct {
 	memory          map[uint64]uint64
 }
 
+// NewMemory2 instantiates a new type 2 memory with encoding of addresses
 func NewMemory2() *Memory2 {
 	return &Memory2{
 		memory:          map[uint64]uint64{},
@@ -78,6 +85,7 @@ func NewMemory2() *Memory2 {
 	}
 }
 
+// Update mask takes an input mask and computes variations
 func (m *Memory2) UpdateMask(s string) {
 	mask := uint64(0)
 	power := float64(35)
@@ -94,6 +102,7 @@ func (m *Memory2) UpdateMask(s string) {
 	m.floatingIndices = indices
 }
 
+// AddValue applies the mask to the provided addresses and stores the value in each
 func (m *Memory2) AddValue(address, value int) {
 	addresses := []uint64{uint64(address) | m.mask}
 
@@ -111,6 +120,7 @@ func (m *Memory2) AddValue(address, value int) {
 	}
 }
 
+// Total returns the total value of all set memory addresses
 func (m *Memory2) Total() uint64 {
 	total := uint64(0)
 	for _, val := range m.memory {
@@ -119,6 +129,7 @@ func (m *Memory2) Total() uint64 {
 	return total
 }
 
+// InitialiseDocking recovers the docking instructions
 func InitialiseDocking(path string) (uint64, uint64) {
 	file, err := os.Open(path)
 	if err != nil {

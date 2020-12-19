@@ -3,6 +3,7 @@ package main
 import (
 	"advent/solutions/dayeight"
 	"advent/solutions/dayeleven"
+	"advent/solutions/dayfifteen"
 	"advent/solutions/dayfive"
 	"advent/solutions/dayfour"
 	"advent/solutions/dayfourteen"
@@ -98,6 +99,9 @@ func RunChallenge(challenge string) string {
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayfourteen":
 		A, B := dayfourteen.InitialiseDocking(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "dayfifteen":
+		A, B := dayfifteen.Play(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
