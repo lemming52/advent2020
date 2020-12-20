@@ -156,8 +156,10 @@ func TestDetermineFields(t *testing.T) {
 	if !reflect.DeepEqual(expectedValid, v.valid) {
 		t.Errorf("valid should match %v %v", expectedValid, v.valid)
 	}
-	if !reflect.DeepEqual(expectedFields, fields) {
-		t.Errorf("fields should match %v %v", expectedFields, fields)
+	for i, f := range fields {
+		if !reflect.DeepEqual(expectedFields[i], f) {
+			t.Errorf("fields should match %v %v", expectedFields[i], f)
+		}
 	}
 
 }
