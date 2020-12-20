@@ -11,6 +11,7 @@ import (
 	"advent/solutions/dayone"
 	"advent/solutions/dayseven"
 	"advent/solutions/daysix"
+	"advent/solutions/daysixteen"
 	"advent/solutions/dayten"
 	"advent/solutions/daythirteen"
 	"advent/solutions/daythree"
@@ -43,6 +44,9 @@ func main() {
 		"dayeleven",
 		"daytwelve",
 		"daythirteen",
+		"dayfourteen",
+		"dayfifteen",
+		"daysixteen",
 	}
 	if *all {
 		for _, c := range completed {
@@ -103,6 +107,9 @@ func RunChallenge(challenge string) string {
 	case "dayfifteen":
 		A, B := dayfifteen.Play(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "daysixteen":
+		A := daysixteen.LoadTickets(input)
+		res = fmt.Sprintf("%s Results A: %d", challenge, A)
 	}
 	return res
 }
