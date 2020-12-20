@@ -136,10 +136,10 @@ func TestDetermineFields(t *testing.T) {
 		[]int{9, 1, 14},
 		[]int{18, 5, 9},
 	}
-	expectedFields := map[string]int{
-		"row":   0,
-		"class": 1,
-		"seat":  2,
+	expectedFields := map[int][]string{
+		0: []string{"row"},
+		1: []string{"class", "row"},
+		2: []string{"class", "row", "seat"},
 	}
 	v := NewValidator()
 	v.AddTicket(ticket)
