@@ -108,8 +108,8 @@ func RunChallenge(challenge string) string {
 		A, B := dayfifteen.Play(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "daysixteen":
-		A := daysixteen.LoadTickets(input)
-		res = fmt.Sprintf("%s Results A: %d", challenge, A)
+		A, B := daysixteen.LoadTickets(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
 }
