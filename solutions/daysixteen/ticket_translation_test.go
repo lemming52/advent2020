@@ -161,5 +161,4 @@ func TestDetermineFields(t *testing.T) {
 			t.Errorf("fields should match %v %v", expectedFields[i], f)
 		}
 	}
-
 }
