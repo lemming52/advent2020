@@ -15,7 +15,7 @@ const (
 	DIVISION       = iota
 )
 
-func Parse(s string) int {
+func Parse(s string, advanced bool) int {
 	components := []int{}
 	i := 0
 	for i < len(s) {
@@ -68,10 +68,13 @@ func Parse(s string) int {
 				j++
 			}
 
-			val := Parse(s[i+1 : j-1])
+			val := Parse(s[i+1:j-1], advanced)
 			components = append(components, val)
 			i = j + 1
 		}
+	}
+	if advanced {
+		return AdvancedCompute(components)
 	}
 	return Compute(components)
 }
@@ -101,17 +104,43 @@ func Compute(components []int) int {
 	return total
 }
 
-func LoadOperations(path string) int {
+func AdvancedCompute(components []int) int {
+	odd := true
+	total := components[0]
+	operation := -1
+	for i, c := range components[1:] {
+		if odd {
+			operation = c
+			odd = false
+		} else {
+			switch operation {
+			case ADDITION:
+				total += c
+			case SUBTRACTION:
+				total -= c
+			case MULTIPLICATION:
+				return total * AdvancedCompute(components[i+1:])
+			case DIVISION:
+				total /= c
+			}
+			odd = true
+		}
+	}
+	return total
+}
+
+func LoadOperations(path string) (int, int) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	total := 0
+	total, advanced := 0, 0
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		total += Parse(scanner.Text())
+		total += Parse(scanner.Text(), false)
+		advanced += Parse(scanner.Text(), true)
 	}
-	return total
+	return total, advanced
 }

@@ -116,8 +116,8 @@ func RunChallenge(challenge string) string {
 		A, B := dayseventeen.LoadCube(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	case "dayeighteen":
-		A := dayeighteen.LoadOperations(input)
-		res = fmt.Sprintf("%s Results A: %d", challenge, A)
+		A, B := dayeighteen.LoadOperations(input)
+		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
 	}
 	return res
 }
