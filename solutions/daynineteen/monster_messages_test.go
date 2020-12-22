@@ -7,7 +7,7 @@ import (
 )
 
 func TestRules(t *testing.T) {
-	c := &Codex{}
+	c := NewCodex()
 	c.rules = map[int]*Rule{
 		0: &Rule{
 			name:     0,
@@ -79,9 +79,9 @@ func TestRules(t *testing.T) {
 	for _, test := range tests {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
-			res, _ := c.rules[0].Apply(tt.input)
+			res, increment := c.rules[0].Apply(tt.input)
 
-			assert.Equal(t, tt.expected, res)
+			assert.Equal(t, tt.expected, res && increment == len(tt.input))
 		})
 	}
 }
