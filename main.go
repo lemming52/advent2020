@@ -9,6 +9,7 @@ import (
 	"advent/solutions/dayfour"
 	"advent/solutions/dayfourteen"
 	"advent/solutions/daynine"
+	"advent/solutions/daynineteen"
 	"advent/solutions/dayone"
 	"advent/solutions/dayseven"
 	"advent/solutions/dayseventeen"
@@ -49,6 +50,8 @@ func main() {
 		"dayfourteen",
 		"dayfifteen",
 		"daysixteen",
+		"dayseventeen",
+		"dayeighteen",
 	}
 	if *all {
 		for _, c := range completed {
@@ -118,6 +121,9 @@ func RunChallenge(challenge string) string {
 	case "dayeighteen":
 		A, B := dayeighteen.LoadOperations(input)
 		res = fmt.Sprintf("%s Results A: %d B: %d", challenge, A, B)
+	case "daynineteen":
+		A := daynineteen.LoadMessages(input)
+		res = fmt.Sprintf("%s Results A: %d", challenge, A)
 	}
 	return res
 }
